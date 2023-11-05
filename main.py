@@ -1,5 +1,5 @@
 """
-docstring TODO
+Defines the main endpoint (the API gateway)
 """
 
 # 3rd party package imports #
@@ -14,7 +14,8 @@ app = flask.Flask(__name__)
 
 @app.route("/<path:requested_path>", methods=["GET", "OPTIONS", "POST"])
 def forward_request(requested_path: str):
-    """DOCSTRING TODO"""
+    """Forwards the user request to the requested endpoint, and
+    returns the response back to the user"""
     # check if requested endpoint exists #
     if requested_path not in endpoint_routing:
         return flask.Response(f"endpoint '/{requested_path}' not found", status=404)
@@ -29,7 +30,7 @@ def forward_request(requested_path: str):
         timeout=60,
         params=flask.request.args,
         data=flask.request.data,
-        headers={key: value for key, value in flask.request.headers.items()},
+        headers=dict(flask.request.headers.items()),
     )
 
     # can run any post-request steps here #
