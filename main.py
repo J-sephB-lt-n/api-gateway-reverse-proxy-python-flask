@@ -30,7 +30,8 @@ def forward_request(requested_path: str):
         timeout=60,
         params=flask.request.args,
         data=flask.request.data,
-        headers=dict(flask.request.headers.items()),
+        # headers=dict(flask.request.headers.items()),
+        # files=flask.request.files,
     )
 
     # can run any post-request steps here #
@@ -42,7 +43,7 @@ def forward_request(requested_path: str):
         status=endpoint_response.status_code,
         headers={
             name: value
-            for name, value in flask.request.headers.items()
+            for name, value in endpoint_response.headers.items()
             if name.lower()
             not in [
                 "content-encoding",
