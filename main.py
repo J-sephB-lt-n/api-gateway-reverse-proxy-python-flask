@@ -38,20 +38,28 @@ def forward_request(requested_path: str):
     # e.g. transformations, data cleaning, compression, request augmentation
 
     # return the response from the requested endpoint #
+    endpoint_response_headers_to_return_to_client = {
+        name: value
+        for name, value in endpoint_response.headers.items()
+        if name.lower()
+        not in [
+            "content-encoding",
+            "content-length",
+            "transfer-encoding",
+            "connection",
+        ]
+    }
+    # if requested endpoint sets cookies, forward those headers on to the client #
+    if endpoint_response.cookies:
+        endpoint_response_headers_to_return_to_client[
+            "Set-Cookie"
+        ] = endpoint_response.raw.headers.getlist("Set-Cookie")
+
+    # return the response to the client #
     response = flask.Response(
         response=endpoint_response.content,
         status=endpoint_response.status_code,
-        headers={
-            name: value
-            for name, value in endpoint_response.headers.items()
-            if name.lower()
-            not in [
-                "content-encoding",
-                "content-length",
-                "transfer-encoding",
-                "connection",
-            ]
-        },
+        headers=endpoint_response_headers_to_return_to_client,
     )
 
     return response

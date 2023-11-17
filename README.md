@@ -1,6 +1,8 @@
 # api-gateway-reverse-proxy-python-flask
 A simple API Gateway (reverse proxy) implementation in [python](https://www.python.org) using [requests](https://github.com/psf/requests) and [Flask](https://github.com/pallets/flask)
 
+Note that there are certain HTTP functions which have not been handled in this simple implementation (e.g. files, forwarding client headers). 
+
 ```bash
 flask --app main run --port 8000
 curl --location 'http://localhost:8000/does_not_exist/v1'
