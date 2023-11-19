@@ -27,20 +27,23 @@ app = flask.Flask(__name__)
 @app.before_request
 def before_request():
     """This code is run prior to every request"""
+    # can run non-endpoint-specific pre-request steps here #
+    # e.g. IP-blocking, rate-limiting, security checks etc. #
+
     if flask.request.origin not in config.ORIGINS_ALLOW:
         return flask.Response("FORBIDDEN", status=403)
 
 
 @app.route("/<path:requested_path>", methods=["GET", "OPTIONS", "POST"])
 def forward_request(requested_path: str):
-    """Forwards the user request to the requested endpoint, and
-    returns the response back to the user"""
-    # check if requested endpoint exists #
+    """Forwards the client request to the requested endpoint, and
+    returns the response back to the client"""
+    # check if requested endpoint exists in the defining routings #
     if requested_path not in endpoint_routing:
         return flask.Response(f"endpoint '/{requested_path}' not found", status=404)
 
-    # can run pre-request steps here #
-    # e.g. IP-blocking, rate-limiting, security checks etc.
+    # can run endpoint-specific pre-request steps here #
+    # e.g. IP-blocking, rate-limiting, security checks etc. #
 
     # forward the request to the requested endpoint #
     try:
@@ -49,7 +52,7 @@ def forward_request(requested_path: str):
             url=endpoint_routing[requested_path],
             timeout=60,
             params=flask.request.args,
-            data=flask.request.get_data(),
+            data=flask.request.get_data(parse_form_data=False),
             headers={"Content-Type": flask.request.headers.get("Content-Type")},
         )
     except requests.exceptions.Timeout:
