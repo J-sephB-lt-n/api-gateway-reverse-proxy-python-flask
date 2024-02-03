@@ -1,5 +1,8 @@
 """
 Defines the API Gateway endpoint
+
+for local testing:
+    flask --app gateway run --port 5000
 """
 
 # standard lib imports #
@@ -53,7 +56,11 @@ def forward_request(requested_path: str):
             timeout=60,
             params=flask.request.args,
             data=flask.request.get_data(parse_form_data=False),
-            headers={"Content-Type": flask.request.headers.get("Content-Type")},
+            headers={
+                key: val
+                for key, val in flask.request.headers.items()
+                if key.lower() in config.HEADERS_TO_FORWARD
+            },
         )
     except requests.exceptions.Timeout:
         return flask.Response("REQUEST TIMEOUT", status=408)
